@@ -4,7 +4,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import { routeTree } from "./routeTree.gen";
 
-import './i18next/i18next';
+import "./i18next/i18next";
 import "./App.css";
 
 const router = createRouter({ routeTree });

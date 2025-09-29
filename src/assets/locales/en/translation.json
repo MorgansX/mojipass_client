@@ -1,5 +1,5 @@
 {
-  "onboarding":{
-    "greeting": "Hello, {{name}}!"
-  }
+	"onboarding": {
+		"greeting": "Hello, {{name}}!"
+	}
 }
