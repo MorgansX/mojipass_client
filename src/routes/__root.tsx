@@ -1,12 +1,17 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import AppWrapper from "../components/templates/AppWrapper";
+import { useTranslation } from "react-i18next";
 
-const RootLayout = () => (
+
+const RootLayout = () => {
+	const {t, i18n} = useTranslation();
+	// i18n.changeLanguage('uk');
+	return (
 	<AppWrapper>
 		<div className="p-2 flex gap-2">
 			<Link to="/" className="[&.active]:font-bold">
-				Home
+				 <h1>{t('onboarding.greeting', { name: 'John' })}</h1>
 			</Link>{" "}
 			<Link to="/about" className="[&.active]:font-bold">
 				About
@@ -17,5 +22,6 @@ const RootLayout = () => (
 		<TanStackRouterDevtools />
 	</AppWrapper>
 );
+}
 
 export const Route = createRootRoute({ component: RootLayout });
