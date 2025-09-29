@@ -1,0 +1,5 @@
+{
+  "onboarding":{
+    "greeting": "Привіт, {{name}}!"
+  }
+}
