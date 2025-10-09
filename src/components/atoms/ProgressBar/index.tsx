@@ -45,9 +45,7 @@ export const ProgressBar: React.FC<ProgressBar> = ({
 
 	return (
 		<ProgressBarWrapper ref={barRef}>
-			<ProgressBarWidthItem itemWidth={`${width}px`}>
-				{currentStep}/{itemsCount}
-			</ProgressBarWidthItem>
+			<ProgressBarWidthItem itemWidth={`${width}px`}/>
 		</ProgressBarWrapper>
 	);
 };
