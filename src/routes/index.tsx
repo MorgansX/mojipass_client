@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { hashPasswordToEmoji } from "../utils/hash";
+import { PasswordForm } from "../components/organisms/PasswordForm";
 
 export const Route = createFileRoute("/")({
 	component: Index,
@@ -24,9 +25,10 @@ function Index() {
 
 	return (
 		<div>
-			<input ref={passwordInputRef} />
+			<PasswordForm />
+			{/* <input ref={passwordInputRef} />
 			<button onClick={onGenerate}>generate</button>
-			{generatedValue}
+			{generatedValue} */}
 		</div>
 	);
 }
