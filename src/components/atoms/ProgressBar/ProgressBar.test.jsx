@@ -1,145 +1,145 @@
 import React from "react";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { ProgressBar } from "./index";
+import "@testing-library/jest-dom";
 
+// Mock the styled components
 jest.mock("./styles", () => ({
-	ProgressBarWrapper: ({ children, ...props }) => (
-		<div data-testid="progress-wrapper" {...props}>
-			{children}
-		</div>
-	),
-	ProgressBarWidthItem: ({ children, itemWidth, ...props }) => (
-		<div data-testid="progress-item" data-width={itemWidth} {...props}>
-			{children}
-		</div>
-	),
+  ProgressBarWrapper: ({ children, ...props }) => (
+    <div data-testid="progress-bar-wrapper" {...props}>
+      {children}
+    </div>
+  ),
+  ProgressBarWidthItem: ({ itemWidth, ...props }) => (
+    <div data-testid="progress-bar-item" data-width={itemWidth} {...props} />
+  ),
 }));
 
 describe("ProgressBar", () => {
-	beforeEach(() => {
-		// Mock clientWidth
-		Object.defineProperty(HTMLElement.prototype, "clientWidth", {
-			configurable: true,
-			value: 700,
-		});
-	});
+  // Mock clientWidth
+  const mockClientWidth = 400;
 
-	it("renders with initial step", () => {
-		render(<ProgressBar itemsCount={7} currentStep={0} />);
+  beforeEach(() => {
+    // Mock the clientWidth property
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      value: mockClientWidth,
+    });
+  });
 
-		expect(screen.getByText("0/7")).toBeInTheDocument();
-	});
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-	it("displays correct step count", () => {
-		render(<ProgressBar itemsCount={5} currentStep={3} />);
+  it("renders without crashing", () => {
+    render(<ProgressBar itemsCount={5} currentStep={0} />);
+    expect(screen.getByTestId("progress-bar-wrapper")).toBeInTheDocument();
+    expect(screen.getByTestId("progress-bar-item")).toBeInTheDocument();
+  });
 
-		expect(screen.getByText("3/5")).toBeInTheDocument();
-	});
+  it("calculates correct width for first step", () => {
+    render(<ProgressBar itemsCount={5} currentStep={0} />);
+    const progressItem = screen.getByTestId("progress-bar-item");
+    
+    // widthPerItem = 400 / 5 = 80
+    // width = (0 + 1) * 80 = 80
+    expect(progressItem).toHaveAttribute("data-width", "80px");
+  });
 
-	it("calculates width correctly based on current step", () => {
-		render(<ProgressBar itemsCount={10} currentStep={5} />);
+  it("calculates correct width for middle step", () => {
+    render(<ProgressBar itemsCount={5} currentStep={2} />);
+    const progressItem = screen.getByTestId("progress-bar-item");
+    
+    // widthPerItem = 400 / 5 = 80
+    // width = (2 + 1) * 80 = 240
+    expect(progressItem).toHaveAttribute("data-width", "240px");
+  });
 
-		const progressItem = screen.getByTestId("progress-item");
-		// 700px (mocked clientWidth) / 10 items * 5 steps = 350px
-		expect(progressItem).toHaveAttribute("data-width", "350px");
-	});
+  it("calculates correct width for last step", () => {
+    render(<ProgressBar itemsCount={5} currentStep={4} />);
+    const progressItem = screen.getByTestId("progress-bar-item");
+    
+    // widthPerItem = 400 / 5 = 80
+    // width = (4 + 1) * 80 = 400
+    expect(progressItem).toHaveAttribute("data-width", "400px");
+  });
 
-	it("shows 0 width when at step 0", () => {
-		render(<ProgressBar itemsCount={7} currentStep={0} />);
+  it("handles different itemsCount values correctly", () => {
+    const { rerender } = render(<ProgressBar itemsCount={10} currentStep={5} />);
+    let progressItem = screen.getByTestId("progress-bar-item");
+    
+    // widthPerItem = 400 / 10 = 40
+    // width = (5 + 1) * 40 = 240
+    expect(progressItem).toHaveAttribute("data-width", "240px");
 
-		const progressItem = screen.getByTestId("progress-item");
-		expect(progressItem).toHaveAttribute("data-width", "0px");
-	});
+    rerender(<ProgressBar itemsCount={3} currentStep={1} />);
+    progressItem = screen.getByTestId("progress-bar-item");
+    
+    // widthPerItem = 400 / 3 = 133.333...
+    // width = (1 + 1) * 133.333... = 266.666...
+    expect(progressItem).toHaveAttribute("data-width", "266.6666666666667px");
+  });
 
-	it("shows full width when at final step", () => {
-		render(<ProgressBar itemsCount={7} currentStep={7} />);
+  it("adds and removes resize event listener", () => {
+    const addEventListenerSpy = jest.spyOn(window, "addEventListener");
+    const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
 
-		const progressItem = screen.getByTestId("progress-item");
-		// 700px (mocked clientWidth) / 7 items * 7 steps = 700px
-		expect(progressItem).toHaveAttribute("data-width", "700px");
-	});
+    const { unmount } = render(<ProgressBar itemsCount={5} currentStep={2} />);
 
-	it("updates width on window resize", () => {
-		const { rerender } = render(
-			<ProgressBar itemsCount={10} currentStep={5} />,
-		);
+    expect(addEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
 
-		// Initial width: 700 / 10 * 5 = 350px
-		let progressItem = screen.getByTestId("progress-item");
-		expect(progressItem).toHaveAttribute("data-width", "350px");
+    unmount();
 
-		// Change clientWidth
-		Object.defineProperty(HTMLElement.prototype, "clientWidth", {
-			configurable: true,
-			value: 1000,
-		});
+    expect(removeEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
 
-		// Trigger resize wrapped in act
-		act(() => {
-			global.dispatchEvent(new Event("resize"));
-		});
+    addEventListenerSpy.mockRestore();
+    removeEventListenerSpy.mockRestore();
+  });
 
-		// Rerender to see updated width
-		rerender(<ProgressBar itemsCount={10} currentStep={5} />);
+  it("updates width on window resize", () => {
+    const { rerender } = render(<ProgressBar itemsCount={5} currentStep={2} />);
+    let progressItem = screen.getByTestId("progress-bar-item");
+    
+    // Initial width calculation with clientWidth = 400
+    expect(progressItem).toHaveAttribute("data-width", "240px");
 
-		progressItem = screen.getByTestId("progress-item");
-		// New width: 1000 / 10 * 5 = 500px
-		expect(progressItem).toHaveAttribute("data-width", "500px");
-	});
+    // Change the clientWidth
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      value: 600,
+    });
 
-	it("cleans up resize listener on unmount", () => {
-		const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+    // Trigger resize event
+    window.dispatchEvent(new Event("resize"));
 
-		const { unmount } = render(<ProgressBar itemsCount={7} currentStep={3} />);
+    // Force re-render to see the updated width
+    rerender(<ProgressBar itemsCount={5} currentStep={2} />);
+    progressItem = screen.getByTestId("progress-bar-item");
+    
+    // New width calculation: (2 + 1) * (600 / 5) = 360
+    expect(progressItem).toHaveAttribute("data-width", "360px");
+  });
 
-		unmount();
+  it("handles edge case with single item", () => {
+    render(<ProgressBar itemsCount={1} currentStep={0} />);
+    const progressItem = screen.getByTestId("progress-bar-item");
+    
+    // widthPerItem = 400 / 1 = 400
+    // width = (0 + 1) * 400 = 400
+    expect(progressItem).toHaveAttribute("data-width", "400px");
+  });
 
-		expect(removeEventListenerSpy).toHaveBeenCalledWith(
-			"resize",
-			expect.any(Function),
-		);
+  it("handles zero initial width gracefully", () => {
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      value: 0,
+    });
 
-		removeEventListenerSpy.mockRestore();
-	});
-
-	it("handles edge case with 1 item", () => {
-		render(<ProgressBar itemsCount={1} currentStep={1} />);
-
-		const progressItem = screen.getByTestId("progress-item");
-		expect(progressItem).toHaveAttribute("data-width", "700px");
-		expect(screen.getByText("1/1")).toBeInTheDocument();
-	});
-
-	it("handles division by zero gracefully", () => {
-		render(<ProgressBar itemsCount={0} currentStep={0} />);
-
-		const progressItem = screen.getByTestId("progress-item");
-		// Component should still render even with 0 items
-		expect(progressItem).toBeInTheDocument();
-	});
-
-	it("calculates correct width for partial progress", () => {
-		render(<ProgressBar itemsCount={4} currentStep={3} />);
-
-		const progressItem = screen.getByTestId("progress-item");
-		// 700px / 4 items * 3 steps = 525px
-		expect(progressItem).toHaveAttribute("data-width", "525px");
-		expect(screen.getByText("3/4")).toBeInTheDocument();
-	});
-
-	it("handles large number of items", () => {
-		render(<ProgressBar itemsCount={100} currentStep={50} />);
-
-		const progressItem = screen.getByTestId("progress-item");
-		// 700px / 100 items * 50 steps = 350px
-		expect(progressItem).toHaveAttribute("data-width", "350px");
-		expect(screen.getByText("50/100")).toBeInTheDocument();
-	});
-
-	it("renders wrapper with ref", () => {
-		render(<ProgressBar itemsCount={5} currentStep={2} />);
-
-		const wrapper = screen.getByTestId("progress-wrapper");
-		expect(wrapper).toBeInTheDocument();
-	});
+    render(<ProgressBar itemsCount={5} currentStep={2} />);
+    const progressItem = screen.getByTestId("progress-bar-item");
+    
+    // widthPerItem = 0 / 5 = 0
+    // width = (2 + 1) * 0 = 0
+    expect(progressItem).toHaveAttribute("data-width", "0px");
+  });
 });

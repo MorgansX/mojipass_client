@@ -7,7 +7,8 @@ import { Onboarding } from "../components/organisms/onboarding";
 
 const RootLayout = () => {
 	const { t } = useTranslation();
-	const { isFirstVisit, markAsVisited } = useFirstVisit();
+	const { isFirstVisit } = useFirstVisit();
+console.log(isFirstVisit,'isFirstVisit')
 	return (
 		<AppWrapper>
 			<div className="p-2 flex gap-2">
