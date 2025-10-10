@@ -1,7 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SyntheticEvent, useMemo, useState } from "react";
-import AppWrapper from "../components/templates/AppWrapper";
-import CryptoJS from "crypto-js";
+import { useRef, useState } from "react";
 import { hashPasswordToEmoji } from "../utils/hash";
 
 export const Route = createFileRoute("/")({
@@ -9,23 +7,24 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-	const [value, setValue] = useState("");
+	const passwordInputRef = useRef<HTMLInputElement>(null);
 	const [generatedValue, setGeneratedValue] = useState("");
 
-	const onChange = (e) => {
-		const val = e.target.value;
-		setValue(val);
+	const onGenerate = async () => {
+		const value = passwordInputRef.current?.value.trim();
+		if (!value) return;
+
+		try {
+			const hashVal = await hashPasswordToEmoji(value, 12);
+			setGeneratedValue(hashVal);
+		} catch (err) {
+			console.log(`Error handler ${err}`);
+		}
 	};
 
-const onGenerate = async () => {
-    if (!value) return;
-    const hashVal = await hashPasswordToEmoji(value);
-    setGeneratedValue(hashVal);
-};
 	return (
 		<div>
-			<input onChange={onChange} value={value} />
-			{value}
+			<input ref={passwordInputRef} />
 			<button onClick={onGenerate}>generate</button>
 			{generatedValue}
 		</div>
