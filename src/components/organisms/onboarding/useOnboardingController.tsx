@@ -9,16 +9,15 @@ export const useOnboardingController = () => {
 	const { markAsVisited } = useFirstVisit();
 
 	const itemsCount = onboardingConfig.length;
-    const isLastStep = currentStep === itemsCount - 1;
+	const isLastStep = currentStep === itemsCount - 1;
 
 	const makeProgressStep = () => {
 		if (currentStep >= itemsCount - 1) {
 			markAsVisited();
-			return
-		};
+			return;
+		}
 		setCurrentStep((prev) => prev + 1);
 	};
-
 
 	useEffect(() => {
 		if (isLastStep) {

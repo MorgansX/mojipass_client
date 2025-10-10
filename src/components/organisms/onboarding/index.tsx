@@ -28,10 +28,10 @@ export const Onboarding = () => {
 				/>
 				<OnboardingButtonWrapper>
 					<OnboardingButtonWidth>
-				<Button variant="primary" onClick={makeProgressStep}>
-					{t(`onboarding.${buttonTitle}`)}
-				</Button>
-				</OnboardingButtonWidth>
+						<Button variant="primary" onClick={makeProgressStep}>
+							{t(`onboarding.${buttonTitle}`)}
+						</Button>
+					</OnboardingButtonWidth>
 				</OnboardingButtonWrapper>
 			</OnboardingItemsWrapper>
 		</OnboardingWrapper>
