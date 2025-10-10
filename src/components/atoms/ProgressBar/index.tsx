@@ -2,20 +2,6 @@ import React from "react";
 import { ProgressBarWrapper, ProgressBarWidthItem } from "./styles";
 import { useEffect, useRef, useState } from "react";
 
-// TODO: Prop usage example:
-
-// const [currentStep, setCurrentStep] = useState(0);
-// const itemsCount = 7;
-
-// const makeProgressStep = () => {
-// 	if (currentStep >= itemsCount) return;
-// 	setCurrentStep((prev) => prev + 1);
-// };
-
-// const resetProgress = () => {
-// 	setCurrentStep(0);
-// };
-
 type ProgressBar = {
 	itemsCount: number;
 	currentStep: number;
@@ -29,7 +15,7 @@ export const ProgressBar: React.FC<ProgressBar> = ({
 	const barRef = useRef<HTMLDivElement>(null);
 
 	const widthPerItem = maxBarWidth / itemsCount;
-	const width = currentStep * widthPerItem;
+	const width = (currentStep + 1) * widthPerItem;
 
 	const updateWidth = () => {
 		if (barRef.current) {
@@ -45,7 +31,7 @@ export const ProgressBar: React.FC<ProgressBar> = ({
 
 	return (
 		<ProgressBarWrapper ref={barRef}>
-			<ProgressBarWidthItem itemWidth={`${width}px`}/>
+			<ProgressBarWidthItem itemWidth={`${width}px`} />
 		</ProgressBarWrapper>
 	);
 };
