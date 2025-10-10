@@ -43,4 +43,4 @@ export const OnboardingButtonWidth = styled.div`
   max-width: 560px;
     width: 100%;
  padding: 10px;
-`
+`;
