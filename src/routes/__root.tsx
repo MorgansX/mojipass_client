@@ -8,8 +8,7 @@ const RootLayout = () => {
 	const { isFirstVisit } = useFirstVisit();
 	return (
 		<AppWrapper>
-			{isFirstVisit && <Onboarding />}
-			<Outlet />
+			{isFirstVisit ? <Onboarding /> : <Outlet />}
 			<TanStackRouterDevtools />
 		</AppWrapper>
 	);

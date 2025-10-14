@@ -29,8 +29,23 @@ export const InputAdornment = styled.div`
   color: #666;
 `;
 
+export const PasswordAdornment = styled.div`
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  color: #666;
+    cursor: pointer;
+`;
+
+export const PasswordHandleButton = styled.button`
+    cursor: pointer;
+    outline: none;
+    border: none;
+    background: transparent;
+`;
+
 export const InputComponent = styled.input`
-  border: none;
   height: 40px;
   border-radius: 8px;
   padding-left:40px;

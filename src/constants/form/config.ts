@@ -2,7 +2,6 @@ export type FormInputData = {
 	name: string;
 	type: string;
 	id: string;
-	adornmentId: string;
 	label: string;
 };
 
@@ -30,4 +29,4 @@ export const formConfig: readonly FormInputData[] = [
 	},
 ];
 
-export const symbolsSlices = [4,8,12,15,32];
+export const symbolsSlices = [4, 8, 12, 15, 32];
